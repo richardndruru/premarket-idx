@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PreMarket IDX">
+<title>Pre-Market Screening IDX</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #18181c;
+    --surface2: #222228;
+    --border: #2e2e38;
+    --border2: #3d3d4a;
+    --text: #f0f0f4;
+    --muted: #8888a0;
+    --accent: #4f8ef7;
+    --accent-dim: #1a2a4a;
+    --green: #2ecc8a;
+    --green-dim: #0d2e20;
+    --red: #f05a5a;
+    --red-dim: #2e0d0d;
+    --amber: #f0a830;
+    --amber-dim: #2e1e00;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 34px; height: 34px;
+    background: var(--accent);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  header p { font-size: 12px; color: var(--muted); }
+
+  .date-badge {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  main { padding: 20px 16px; max-width: 520px; margin: 0 auto; }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-icon {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .icon-globe { background: var(--accent-dim); color: var(--accent); }
+  .icon-chart { background: var(--green-dim); color: var(--green); }
+  .icon-focus { background: var(--amber-dim); color: var(--amber); }
+
+  .section-title { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); text-transform: uppercase; }
+
+  .section-body { padding: 14px 16px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .span2 { grid-column: span 2; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  input[type="text"], select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="text"]:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888a0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .sentimen-pills { display: flex; gap: 8px; }
+  .pill {
+    flex: 1;
+    padding: 9px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pill.active-bull { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .pill.active-mix  { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+  .pill.active-bear { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+
+  .saham-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .saham-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .ticker-input {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    width: 80px !important;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .macd-select { flex: 1; font-size: 13px !important; }
+
+  .remove-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .remove-btn:active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+
+  .add-saham-btn {
+    width: 100%;
+    padding: 12px;
+    background: none;
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+    margin-top: 2px;
+  }
+  .add-saham-btn:active { background: var(--surface2); }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-bottom: 14px;
+    letter-spacing: -0.2px;
+  }
+  .generate-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  .output-section {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .output-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .output-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .output-text {
+    padding: 14px 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .output-actions {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .action-btn:active { opacity: 0.75; }
+  .action-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .tip {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 0 16px 8px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📈</div>
+  <div>
+    <h1>Pre-Market IDX</h1>
+    <p>Screening harian sebelum market buka</p>
+  </div>
+  <div class="date-badge" id="date-badge">—</div>
+</header>
+
+<main>
+
+  <!-- KONDISI GLOBAL -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-globe">🌐</div>
+      <span class="section-title">Kondisi Global</span>
+    </div>
+    <div class="section-body">
+      <div class="grid2" style="margin-bottom:10px;">
+        <div class="field">
+          <label>IHSG kemarin</label>
+          <input type="text" id="ihsg" placeholder="7.250 (-0.3%)">
+        </div>
+        <div class="field">
+          <label>USD/IDR</label>
+          <input type="text" id="usdidr" placeholder="16.250">
+        </div>
+      </div>
+      <div class="grid2" style="margin-bottom:10px;">
+        <div class="field">
+          <label>SPX / NDX</label>
+          <input type="text" id="spx" placeholder="Naik 0.5%">
+        </div>
+        <div class="field">
+          <label>VIX</label>
+          <input type="text" id="vix" placeholder="14 (turun)">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Asia (Nikkei / HSI / Kospi)</label>
+        <input type="text" id="asia" placeholder="Mixed — Nikkei -0.2%, HSI flat">
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Sentimen</label>
+        <div class="sentimen-pills">
+          <div class="pill active-bull" data-val="Risk-on" onclick="setSentimen(this, 'bull')">✅ Risk-on</div>
+          <div class="pill" data-val="Mixed" onclick="setSentimen(this, 'mix')">⚠️ Mixed</div>
+          <div class="pill" data-val="Risk-off" onclick="setSentimen(this, 'bear')">🚫 Risk-off</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Katalis khusus hari ini</label>
+        <input type="text" id="katalis" placeholder="FOMC, data NFP, earnings, dll">
+      </div>
+    </div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-chart">📊</div>
+      <span class="section-title">Watchlist Saham</span>
+    </div>
+    <div class="section-body">
+      <div id="saham-list"></div>
+      <button class="add-saham-btn" onclick="addSaham()">
+        <span style="font-size:18px;">＋</span> Tambah saham
+      </button>
+    </div>
+  </div>
+
+  <!-- FOKUS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-focus">🎯</div>
+      <span class="section-title">Fokus Analisis</span>
+    </div>
+    <div class="section-body">
+      <div class="field" style="margin-bottom:10px;">
+        <label>Yang saya butuhkan</label>
+        <select id="fokus">
+          <option>Ranking saham terkuat — mana yang paling layak dimasuki</option>
+          <option>Identifikasi saham paling dekat golden cross MA</option>
+          <option>Cari saham yang confirm breakout hari ini</option>
+          <option>Evaluasi risk/reward tiap saham di watchlist</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Style trade</label>
+        <select id="style">
+          <option>Scalping (5–15 menit)</option>
+          <option>Intraday (same-day exit)</option>
+          <option>Swing (1–5 hari)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="generate-btn" onclick="generatePrompt()">
+    ✦ Generate Prompt untuk Claude
+  </button>
+
+  <!-- OUTPUT -->
+  <div class="output-section" id="output-section">
+    <div class="output-header">
+      <span class="output-title">Prompt siap pakai</span>
+      <span style="font-size:12px; color:var(--muted);">Copy → paste ke Claude</span>
+    </div>
+    <div class="output-text" id="output-text"></div>
+    <div class="output-actions">
+      <button class="action-btn" onclick="copyPrompt()">📋 Copy</button>
+      <button class="action-btn primary" onclick="openClaude()">Buka Claude ↗</button>
+    </div>
+  </div>
+
+  <p class="tip">Setelah copy prompt, buka app Claude → paste → kirim.<br>Data dari Stockbit/TradingView, analisis oleh Claude.</p>
+
+</main>
+
+<div class="toast" id="toast">✓ Tersalin ke clipboard</div>
+
+<script>
+const sahamIds = [];
+let sentimenVal = 'Risk-on';
+
+function setSentimen(el, type) {
+  document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+  el.className = 'pill active-' + type;
+  sentimenVal = el.dataset.val;
+}
+
+function addSaham() {
+  const id = 's' + Date.now();
+  sahamIds.push(id);
+  const div = document.createElement('div');
+  div.className = 'saham-card';
+  div.id = id;
+  div.innerHTML = `
+    <div class="saham-top">
+      <input type="text" class="ticker-input" placeholder="BBCA" id="t-${id}">
+      <select class="macd-select" id="m-${id}">
+        <option value="MACD bullish (golden cross / crossover ke atas)">MACD bullish</option>
+        <option value="MACD netral (belum ada sinyal jelas)" selected>MACD netral</option>
+        <option value="MACD bearish (death cross / crossover ke bawah)">MACD bearish</option>
+        <option value="MACD divergensi positif">Divergensi +</option>
+        <option value="MACD divergensi negatif">Divergensi -</option>
+      </select>
+      <button class="remove-btn" onclick="removeSaham('${id}')">×</button>
+    </div>
+    <div class="grid3" style="margin-bottom:10px;">
+      <div class="field"><label>Close</label><input type="text" id="cl-${id}" placeholder="9.300"></div>
+      <div class="field"><label>MA5</label><input type="text" id="m5-${id}" placeholder="9.180"></div>
+      <div class="field"><label>MA10</label><input type="text" id="m10-${id}" placeholder="9.050"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>MA20</label><input type="text" id="m20-${id}" placeholder="8.900"></div>
+      <div class="field"><label>Volume</label><input type="text" id="vl-${id}" placeholder="45jt lot"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="field"><label>Catatan (opsional)</label><input type="text" id="ct-${id}" placeholder="Near resistance, news, cum-date, dll"></div>
+  `;
+  document.getElementById('saham-list').appendChild(div);
+}
+
+function removeSaham(id) {
+  const idx = sahamIds.indexOf(id);
+  if (idx > -1) sahamIds.splice(idx, 1);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function generatePrompt() {
+  const d = new Date();
+  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const tanggal = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+  const ihsg    = document.getElementById('ihsg').value    || '—';
+  const usdidr  = document.getElementById('usdidr').value  || '—';
+  const spx     = document.getElementById('spx').value     || '—';
+  const vix     = document.getElementById('vix').value     || '—';
+  const asia    = document.getElementById('asia').value    || '—';
+  const katalis = document.getElementById('katalis').value;
+  const fokus   = document.getElementById('fokus').value;
+  const style   = document.getElementById('style').value;
+
+  let sahamLines = '';
+  sahamIds.forEach(id => {
+    const ticker = (document.getElementById('t-'+id)?.value || '').toUpperCase().trim();
+    if (!ticker) return;
+    const cl  = document.getElementById('cl-'+id)?.value  || '—';
+    const m5  = document.getElementById('m5-'+id)?.value  || '—';
+    const m10 = document.getElementById('m10-'+id)?.value || '—';
+    const m20 = document.getElementById('m20-'+id)?.value || '—';
+    const macd= document.getElementById('m-'+id)?.value   || '—';
+    const vol = document.getElementById('vl-'+id)?.value  || '—';
+    const cat = document.getElementById('ct-'+id)?.value;
+    sahamLines += `\n• ${ticker}: Close ${cl} | MA5=${m5} MA10=${m10} MA20=${m20} | ${macd} | Vol ${vol}${cat ? ' | ' + cat : ''}`;
+  });
+
+  if (!sahamLines) sahamLines = '\n(Belum ada saham)';
+
+  const prompt =
+`=== PRE-MARKET SCREENING — ${tanggal} ===
+
+KONDISI GLOBAL:
+• IHSG kemarin: ${ihsg}
+• USD/IDR: ${usdidr}
+• SPX/NDX: ${spx}
+• VIX: ${vix}
+• Asia: ${asia}
+• Sentimen: ${sentimenVal}${katalis ? '\n• Katalis: ' + katalis : ''}
+
+WATCHLIST (MA5/MA10/MA20 + MACD):${sahamLines}
+
+YANG DIBUTUHKAN:
+${fokus}. Style: ${style}.
+
+Tolong:
+1. Ranking saham dari paling menarik ke paling berisiko, beserta reasoning singkat
+2. Untuk 2 saham teratas — berikan level entry, target profit, dan stop loss
+3. Flag saham yang sebaiknya di-skip hari ini beserta alasannya
+4. Catatan risiko berdasarkan kondisi global di atas`;
+
+  document.getElementById('output-text').textContent = prompt;
+  document.getElementById('output-section').style.display = 'block';
+  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyPrompt() {
+  const text = document.getElementById('output-text').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showToast);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  }
+}
+
+function openClaude() {
+  copyPrompt();
+  setTimeout(() => window.open('https://claude.ai', '_blank'), 300);
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function setDate() {
+  const d = new Date();
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  document.getElementById('date-badge').textContent = `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+setDate();
+addSaham();
+addSaham();
+</script>
+</body>
+</html>
